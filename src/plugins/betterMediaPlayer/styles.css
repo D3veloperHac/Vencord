@@ -1,0 +1,488 @@
+.vc-bmp-player {
+    /* themes can override these */
+    --vc-bmp-accent: #1ed760;
+    --vc-bmp-text: var(--text-strong, var(--header-primary, #fff));
+    --vc-bmp-text-2: var(--text-default, var(--text-normal, #dbdee1));
+    --vc-bmp-text-3: var(--text-muted, #949ba4);
+    --vc-bmp-muted: var(--text-muted, #b3b3b3);
+    --vc-bmp-background: var(--background-base-low, var(--background-secondary, var(--background-primary, #1e1f22)));
+    --vc-bmp-border: var(--border-subtle, var(--background-modifier-accent, rgb(255 255 255 / 0.08)));
+    --vc-bmp-cover-size: 56px;
+    --vc-bmp-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    container: vc-bmp / inline-size;
+
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background: var(--vc-bmp-background);
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid var(--vc-bmp-border);
+}
+
+.vc-bmp-player[data-compact="true"] {
+    --vc-bmp-cover-size: 40px;
+    padding: 8px 10px;
+}
+
+.vc-bmp-glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.28;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+
+.vc-bmp-player[data-playing="false"] .vc-bmp-glow {
+    opacity: 0.12;
+}
+
+/* A tiny image blurred once and scaled up, which is much cheaper than blurring it at full size */
+.vc-bmp-glow-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    transform: translate(-50%, -50%) scale(14);
+    filter: blur(7px) saturate(1.6);
+    animation: vc-bmp-fade 0.9s ease both;
+}
+
+@keyframes vc-bmp-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.vc-bmp-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.vc-bmp-enter {
+    animation: vc-bmp-enter 0.4s var(--vc-bmp-ease) both;
+}
+
+@keyframes vc-bmp-enter {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+.vc-bmp-cover {
+    flex: none;
+    width: var(--vc-bmp-cover-size);
+    height: var(--vc-bmp-cover-size);
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--background-mod-subtle, rgb(255 255 255 / 0.06));
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
+    cursor: pointer;
+    transition: transform 0.2s var(--vc-bmp-ease);
+}
+
+.vc-bmp-cover:hover,
+.vc-bmp-cover:focus-visible {
+    transform: scale(1.05);
+}
+
+.vc-bmp-cover:active {
+    transform: scale(0.97);
+}
+
+.vc-bmp-cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vc-bmp-titles {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.vc-bmp-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.vc-bmp-title-row .vc-bmp-marquee {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.vc-bmp-source {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--vc-bmp-text-2);
+}
+
+.vc-bmp-source[data-source*="spotify"] { color: #1db954; }
+.vc-bmp-source[data-source*="youtube"] { color: #ff4d4d; }
+
+.vc-bmp-source-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.vc-bmp-source-name {
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.vc-bmp-marquee {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.vc-bmp-marquee-inner {
+    display: inline-block;
+}
+
+/* Fade out the end of text that doesn't fit, and scroll it while the player is hovered */
+.vc-bmp-marquee[data-overflow="true"] {
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+}
+
+.vc-bmp-player:hover .vc-bmp-marquee[data-overflow="true"] .vc-bmp-marquee-inner {
+    will-change: transform;
+    animation: vc-bmp-scroll var(--vc-bmp-dur) ease-in-out 0.6s infinite alternate;
+}
+
+@keyframes vc-bmp-scroll {
+    0%, 12% { transform: translateX(0); }
+    88%, 100% { transform: translateX(var(--vc-bmp-shift)); }
+}
+
+.vc-bmp-title {
+    color: var(--vc-bmp-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+}
+
+.vc-bmp-artists,
+.vc-bmp-album {
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.vc-bmp-artists { color: var(--vc-bmp-text-2); }
+.vc-bmp-album,
+.vc-bmp-comma { color: var(--vc-bmp-text-3); }
+
+.vc-bmp-player [role="link"] {
+    cursor: pointer;
+}
+
+.vc-bmp-player [role="link"]:is(:hover, :focus-visible) {
+    text-decoration: underline;
+    outline: none;
+}
+
+.vc-bmp-seek {
+    margin-top: 8px;
+}
+
+.vc-bmp-seek-hit {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 16px;
+    cursor: pointer;
+    touch-action: none;
+    outline: none;
+}
+
+.vc-bmp-seek-rail {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--vc-bmp-text) 18%, transparent);
+    transition: transform 0.15s var(--vc-bmp-ease);
+}
+
+.vc-bmp-seek-hit:is(:hover, :focus-visible) .vc-bmp-seek-rail,
+.vc-bmp-seek[data-dragging="true"] .vc-bmp-seek-rail {
+    transform: scaleY(1.5);
+}
+
+.vc-bmp-seek-fill {
+    width: 100%;
+    height: 100%;
+    background: var(--vc-bmp-text);
+    transform: scaleX(var(--vc-bmp-progress));
+    transform-origin: left center;
+}
+
+.vc-bmp-seek-hit:is(:hover, :focus-visible) .vc-bmp-seek-fill,
+.vc-bmp-seek[data-dragging="true"] .vc-bmp-seek-fill {
+    background: var(--vc-bmp-accent);
+}
+
+.vc-bmp-seek-thumb {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--vc-bmp-progress) * 100%);
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: var(--vc-bmp-text);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.45);
+    opacity: 0;
+    transform: scale(0.5);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.18s var(--vc-bmp-ease);
+}
+
+.vc-bmp-seek-hit:is(:hover, :focus-visible) .vc-bmp-seek-thumb,
+.vc-bmp-seek[data-dragging="true"] .vc-bmp-seek-thumb {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.vc-bmp-seek-tip {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--vc-bmp-text);
+    background: var(--background-floating, rgb(0 0 0 / 0.85));
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.vc-bmp-times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1px;
+    font-size: 11px;
+    line-height: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--vc-bmp-muted);
+}
+
+.vc-bmp-controls-wrap {
+    display: grid;
+    grid-template-rows: 1fr;
+    margin-top: 6px;
+}
+
+.vc-bmp-controls {
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 2px 8px;
+}
+
+/* "Only while hovering" collapses the controls row, so this is the one animation that affects layout */
+.vc-bmp-player[data-controls="hover"] .vc-bmp-controls-wrap {
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    opacity: 0;
+    transition: grid-template-rows 0.22s var(--vc-bmp-ease), margin-top 0.22s var(--vc-bmp-ease), opacity 0.18s ease;
+}
+
+.vc-bmp-player[data-controls="hover"] .vc-bmp-controls {
+    overflow: hidden;
+}
+
+.vc-bmp-player[data-controls="hover"]:is(:hover, :focus-within) .vc-bmp-controls-wrap {
+    grid-template-rows: 1fr;
+    margin-top: 6px;
+    opacity: 1;
+}
+
+.vc-bmp-player[data-controls="hover"]:is(:hover, :focus-within) .vc-bmp-controls {
+    overflow: visible;
+    transition: overflow 0s 0.22s;
+}
+
+.vc-bmp-btn {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--vc-bmp-muted);
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s var(--vc-bmp-ease);
+}
+
+.vc-bmp-btn:hover {
+    color: #fff;
+    transform: scale(1.06);
+}
+
+.vc-bmp-btn:active {
+    transform: scale(0.94);
+}
+
+.vc-bmp-btn:focus-visible {
+    outline: 2px solid var(--vc-bmp-accent);
+    outline-offset: 1px;
+}
+
+.vc-bmp-btn[data-active="true"] {
+    color: var(--vc-bmp-accent);
+}
+
+/* A dot under active toggles, so colour isn't the only indicator */
+.vc-bmp-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.15s ease, transform 0.18s var(--vc-bmp-ease);
+}
+
+.vc-bmp-btn[data-active="true"]::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.vc-bmp-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.vc-bmp-shuffle,
+.vc-bmp-repeat {
+    width: 24px;
+}
+
+.vc-bmp-shuffle .vc-bmp-icon,
+.vc-bmp-repeat .vc-bmp-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.vc-bmp-play {
+    width: 40px;
+    height: 40px;
+    margin: 0 4px;
+    color: #000;
+    background: #fff;
+}
+
+.vc-bmp-play:hover {
+    color: #000;
+    transform: scale(1.07);
+}
+
+.vc-bmp-play:active {
+    transform: scale(0.94);
+}
+
+.vc-bmp-play .vc-bmp-icon {
+    width: 25px;
+    height: 25px;
+}
+
+.vc-bmp-repeat-one {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Wide sidebar */
+@container vc-bmp (min-width: 300px) {
+    .vc-bmp-player:not([data-compact="true"]) .vc-bmp-cover {
+        width: 72px;
+        height: 72px;
+    }
+
+    .vc-bmp-title {
+        font-size: 15px;
+    }
+}
+
+/* Narrow sidebar */
+@container vc-bmp (max-width: 210px) {
+    .vc-bmp-header {
+        gap: 10px;
+    }
+
+    .vc-bmp-cover {
+        width: 44px;
+        height: 44px;
+    }
+
+    .vc-bmp-controls {
+        gap: 2px;
+    }
+
+    .vc-bmp-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .vc-bmp-play {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* Very narrow: drop everything that isn't essential */
+@container vc-bmp (max-width: 160px) {
+    .vc-bmp-cover,
+    .vc-bmp-shuffle,
+    .vc-bmp-repeat,
+    .vc-bmp-album {
+        display: none;
+    }
+}
+
+.vc-bmp-fallback {
+    padding: 0.5em;
+    color: var(--text-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-bmp-player *,
+    .vc-bmp-player *::before,
+    .vc-bmp-player *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
