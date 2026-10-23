@@ -1,6 +1,6 @@
 # BetterMediaPlayer
 
-BetterMediaPlayer is an AI-assisted, enhanced version of Vencord's original `spotifyControls` plugin. It builds upon the original concept with expanded music service support, and improved media filtering.
+BetterMediaPlayer is an AI-assisted, enhanced version of Vencord's original `spotifyControls` plugin. It builds upon the original concept with expanded music service support, and improved media filtering. AI Used: Codex & Claude.
 
 ## Original Project
 
